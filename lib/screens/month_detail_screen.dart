@@ -44,8 +44,8 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                   margin: const EdgeInsets.all(12),
                   child: ListTile(
                     title: Text(c.nombre),
-                    onTap: () {
-                      Navigator.pushNamed(
+                    onTap: () async {
+                      final resultado = await Navigator.pushNamed(
                         context,
                         '/comprobanteDetail',
                         arguments: {
@@ -54,6 +54,9 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
                           'anio': anio,
                         },
                       );
+                      if (resultado == true) {
+                        _cargarComprobantes();
+                      }
                     },
                   ),
                 );

@@ -5,7 +5,7 @@ import 'comprobante_service.dart';
 import '../models/comprobante.dart';
 
 class SharedFilesService {
-  static const MethodChannel _channel = MethodChannel('com.example.recibido_app/shared_files');
+  static const MethodChannel _channel = MethodChannel('com.maxiserrano.recibido/shared_files');
 
   static Future<List<String>?> getSharedFiles() async {
     try {

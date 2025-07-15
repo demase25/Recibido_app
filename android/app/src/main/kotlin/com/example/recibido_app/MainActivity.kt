@@ -1,4 +1,4 @@
-package com.example.recibido_app
+package com.maxiserrano.recibido
 
 import android.content.Intent
 import android.net.Uri
@@ -7,7 +7,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.recibido_app/shared_files"
+    private val CHANNEL = "com.maxiserrano.recibido/shared_files"
     private var sharedFiles: List<String>? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

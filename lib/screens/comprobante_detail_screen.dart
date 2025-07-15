@@ -5,15 +5,29 @@ import '../models/comprobante.dart';
 import '../services/comprobante_service.dart';
 import '../services/archivo_service.dart';
 
-class ComprobanteDetailScreen extends StatelessWidget {
+class ComprobanteDetailScreen extends StatefulWidget {
+  @override
+  _ComprobanteDetailScreenState createState() => _ComprobanteDetailScreenState();
+}
+
+class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
+  late String nombre;
+  late String mes;
+  late int anio;
+  late String fecha;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+    nombre = args['nombre'];
+    mes = args['mes'];
+    anio = args['anio'];
+    fecha = '$mes $anio';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
-    final String nombre = args['nombre'];
-    final String mes = args['mes'];
-    final int anio = args['anio'];
-    final String fecha = '$mes $anio';
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle del Comprobante'),
@@ -33,7 +47,7 @@ class ComprobanteDetailScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.transparent,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,144 +142,135 @@ class ComprobanteDetailScreen extends StatelessWidget {
             SizedBox(height: 16),
             
             // Acciones
-            Expanded(
-              child: Column(
-                children: [
-                  // Botón Compartir
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.share, color: Colors.white),
-                      label: Text(
-                        'Compartir',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.share, color: Colors.white),
+                    label: Text(
+                      'Compartir',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade300,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      onPressed: () async {
-                        try {
-                          final ruta = await ArchivoService.obtenerRutaArchivo(nombre, fecha);
-                          await Share.shareXFiles(
-                            [XFile(ruta)],
-                            text: 'Compartir archivo: $nombre',
-                          );
-                        } catch (e) {
+                      elevation: 2,
+                    ),
+                    onPressed: () async {
+                      try {
+                        final ruta = await ArchivoService.obtenerRutaArchivo(nombre, fecha);
+                        await Share.shareXFiles(
+                          [XFile(ruta)],
+                          text: 'Compartir archivo: $nombre',
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error al compartir archivo: $e')),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.open_in_new, color: Colors.white),
+                    label: Text(
+                      'Abrir con',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade300,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    onPressed: () async {
+                      try {
+                        final ruta = await ArchivoService.obtenerRutaArchivo(nombre, fecha);
+                        final result = await OpenFile.open(ruta);
+                        if (result.type != ResultType.done) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error al compartir archivo: $e')),
+                            SnackBar(content: Text('No se pudo abrir el archivo: ${result.message}')),
                           );
                         }
-                      },
-                    ),
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error al abrir el archivo: $e')),
+                        );
+                      }
+                    },
                   ),
-                  
-                  // Botón Abrir con
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.open_in_new, color: Colors.white),
-                      label: Text(
-                        'Abrir con',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.edit, color: Colors.white),
+                    label: Text(
+                      'Renombrar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                      onPressed: () async {
-                        try {
-                          final ruta = await ArchivoService.obtenerRutaArchivo(nombre, fecha);
-                          final result = await OpenFile.open(ruta);
-                          if (result.type != ResultType.done) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('No se pudo abrir el archivo: ${result.message}')),
-                            );
-                          }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error al abrir el archivo: $e')),
-                          );
-                        }
-                      },
                     ),
-                  ),
-                  
-                  // Botón Renombrar
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.edit, color: Colors.white),
-                      label: Text(
-                        'Renombrar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade300,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                      onPressed: () {
-                        _mostrarDialogoRenombrar(context, nombre, fecha);
-                      },
+                      elevation: 2,
                     ),
+                    onPressed: () {
+                      _mostrarDialogoRenombrar(context);
+                    },
                   ),
-                  
-                  // Botón Eliminar
-                  Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 12),
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.delete, color: Colors.white),
-                      label: Text(
-                        'Eliminar',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: Icon(Icons.delete, color: Colors.white),
+                    label: Text(
+                      'Eliminar',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade300,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
-                      ),
-                      onPressed: () {
-                        _mostrarDialogoEliminar(context, nombre, fecha);
-                      },
                     ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade300,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 2,
+                    ),
+                    onPressed: () {
+                      _mostrarDialogoEliminar(context, nombre, fecha);
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -273,9 +278,9 @@ class ComprobanteDetailScreen extends StatelessWidget {
     );
   }
 
-  void _mostrarDialogoRenombrar(BuildContext context, String nombreActual, String fecha) {
+  void _mostrarDialogoRenombrar(BuildContext context) {
     final TextEditingController _nuevoNombreController = TextEditingController();
-    _nuevoNombreController.text = nombreActual;
+    _nuevoNombreController.text = nombre;
 
     showDialog(
       context: context,
@@ -304,9 +309,12 @@ class ComprobanteDetailScreen extends StatelessWidget {
                   return;
                 }
 
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Cierra el diálogo
                 try {
-                  await ComprobanteService.renombrarComprobante(nombreActual, nuevoNombre, fecha);
+                  await ComprobanteService.renombrarComprobante(nombre, nuevoNombre, fecha);
+                  setState(() {
+                    nombre = nuevoNombre;
+                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Archivo renombrado correctamente.')),
                   );
