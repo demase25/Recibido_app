@@ -7,6 +7,7 @@ import '../services/comprobante_service.dart';
 import '../services/shared_files_service.dart';
 import '../models/comprobante.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,12 +24,32 @@ class _HomeScreenState extends State<HomeScreen> {
   int? anioInicio;
   bool cargando = true;
   Map<String, int> comprobantesPorFecha = {};
+  BannerAd? _bannerAd;
+  bool _mostrarInstructivo = true; // Controla si mostrar la foto instructiva
 
   @override
   void initState() {
     super.initState();
     _cargarPreferencias();
     _processSharedFiles();
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-1255034608846557/8312677581', // ID real de banner
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _ocultarInstructivo() {
+    setState(() {
+      _mostrarInstructivo = false;
+    });
   }
 
   Future<void> _cargarPreferencias() async {
@@ -153,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(Icons.settings, color: Colors.amberAccent),
             tooltip: 'Elegir mes/año de inicio',
             onPressed: _mostrarSelectorMesAnio,
           ),
@@ -173,41 +194,110 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Colors.transparent,
       ),
-      body: ListView.builder(
-        itemCount: 12,
-        itemBuilder: (context, index) {
-          int mes = (mesInicio! + index) % 12;
-          int anio = anioInicio! + ((mesInicio! + index) ~/ 12);
-          String fecha = "${meses[mes]} $anio";
-          int cantidad = comprobantesPorFecha[fecha] ?? 0;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 12,
+                  itemBuilder: (context, index) {
+                    int mes = (mesInicio! + index) % 12;
+                    int anio = anioInicio! + ((mesInicio! + index) ~/ 12);
+                    String fecha = "${meses[mes]} $anio";
+                    int cantidad = comprobantesPorFecha[fecha] ?? 0;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        color: Colors.teal.shade100,
+                        child: ListTile(
+                          title: Text(
+                            '$fecha',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text('Comprobantes: $cantidad'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/monthDetail',
+                              arguments: {'mes': meses[mes], 'anio': anio},
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-              color: Colors.teal.shade100,
-              child: ListTile(
-                title: Text(
-                  '$fecha',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+              if (_bannerAd != null)
+                Container(
+                  alignment: Alignment.center,
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+            ],
+          ),
+          // Overlay de la foto instructiva
+          if (_mostrarInstructivo)
+            GestureDetector(
+              onTap: _ocultarInstructivo,
+              child: Container(
+                color: Colors.black.withOpacity(0.8),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              blurRadius: 10,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'assets/images/instructivorecibido.png',
+                            fit: BoxFit.contain,
+                            width: MediaQuery.of(context).size.width * 0.95,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        child: const Text(
+                          'Toca la pantalla para continuar',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                subtitle: Text('Comprobantes: $cantidad'),
-                trailing: const Icon(Icons.arrow_forward_ios),
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/monthDetail',
-                    arguments: {'mes': meses[mes], 'anio': anio},
-                  );
-                },
               ),
             ),
-          );
-        },
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
