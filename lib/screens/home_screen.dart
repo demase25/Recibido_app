@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 
 import '../services/archivo_service.dart';
@@ -32,18 +33,22 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _cargarPreferencias();
     _processSharedFiles();
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-1255034608846557/8312677581', // ID real de banner
-      size: AdSize.banner,
-      request: AdRequest(),
-      listener: BannerAdListener(),
-    )..load();
+    _inicializarBanner();
   }
 
   @override
   void dispose() {
     _bannerAd?.dispose();
     super.dispose();
+  }
+
+  void _inicializarBanner() {
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-1255034608846557/5650144787', // ID real de banner
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(),
+    )..load();
   }
 
   void _ocultarInstructivo() {
@@ -160,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     return Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
         title: Text(
           'Recibido!',
           style: TextStyle(
