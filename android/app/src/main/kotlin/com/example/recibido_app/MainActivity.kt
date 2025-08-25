@@ -2,6 +2,12 @@ package com.maxiserrano.recibido
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Bundle
+import android.view.WindowInsetsController
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.graphics.ColorUtils
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -9,6 +15,60 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.maxiserrano.recibido/shared_files"
     private var sharedFiles: List<String>? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        
+        // Configuración completa edge-to-edge para Android 15+ y SDK 35+
+        setupEdgeToEdge()
+    }
+    
+    private fun setupEdgeToEdge() {
+        // Habilitar edge-to-edge
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // Configurar colores del sistema usando las nuevas APIs
+        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+        
+        // Configurar colores de las barras del sistema (reemplazando APIs obsoletas)
+        setupSystemBarColors(windowInsetsController)
+        
+        // Configurar comportamiento de los insets
+        setupInsetsBehavior()
+    }
+    
+    private fun setupSystemBarColors(windowInsetsController: WindowInsetsControllerCompat) {
+        // Colores basados en la paleta de la app (teal pastel)
+        val primaryColor = android.graphics.Color.parseColor("#26A69A") // teal.shade400
+        val primaryDarkColor = android.graphics.Color.parseColor("#00796B") // teal.shade800
+        
+        // Configurar barra de estado (reemplaza setStatusBarColor obsoleto)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        windowInsetsController.isAppearanceLightStatusBars = false // Iconos claros para fondo oscuro
+        
+        // Configurar barra de navegación (reemplaza setNavigationBarColor obsoleto)
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        windowInsetsController.isAppearanceLightNavigationBars = true // Iconos oscuros para fondo claro
+        
+        // Configurar divisor de navegación (reemplaza setNavigationBarDividerColor obsoleto)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.navigationBarDividerColor = android.graphics.Color.TRANSPARENT
+        }
+    }
+    
+    private fun setupInsetsBehavior() {
+        // Configurar comportamiento de los insets para edge-to-edge
+        val decorView = window.decorView
+        decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
+            val insets = WindowInsetsCompat.toWindowInsetsCompat(windowInsets)
+            
+            // Aplicar padding para evitar que el contenido se superponga con las barras del sistema
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            
+            windowInsets
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
