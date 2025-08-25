@@ -56,4 +56,25 @@ class ArchivoService {
     // Renombrar el archivo
     await archivoActual.rename(rutaNueva);
   }
+
+  // Eliminar un archivo guardado
+  static Future<void> eliminarArchivo(String nombreArchivo, String subcarpeta) async {
+    final appDir = await obtenerDirectorioApp();
+    final rutaArchivo = p.join(appDir.path, subcarpeta, nombreArchivo);
+    
+    final archivo = File(rutaArchivo);
+    if (await archivo.exists()) {
+      await archivo.delete();
+    }
+  }
+
+  // Eliminar una carpeta completa y todo su contenido
+  static Future<void> eliminarCarpeta(String subcarpeta) async {
+    final appDir = await obtenerDirectorioApp();
+    final carpeta = Directory(p.join(appDir.path, subcarpeta));
+    
+    if (await carpeta.exists()) {
+      await carpeta.delete(recursive: true);
+    }
+  }
 }

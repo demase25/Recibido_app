@@ -51,7 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
     )..load();
   }
 
-  void _ocultarInstructivo() {
+  void _ocultarInstructivo() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('mostrarInstructivo', false);
     setState(() {
       _mostrarInstructivo = false;
     });
@@ -62,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       mesInicio = prefs.getInt('mesInicio') ?? DateTime.now().month - 1;
       anioInicio = prefs.getInt('anioInicio') ?? DateTime.now().year;
+      _mostrarInstructivo = prefs.getBool('mostrarInstructivo') ?? true;
     });
     await _cargarComprobantesPorFecha();
     setState(() { cargando = false; });
@@ -80,9 +83,195 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() { cargando = false; });
   }
 
+
+
+  // Método para mostrar confirmación de borrado
+  void _mostrarConfirmacionBorrar(String fecha) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+                     title: Row(
+             mainAxisSize: MainAxisSize.min,
+             children: [
+               Icon(Icons.warning, color: Colors.orange, size: 20),
+               SizedBox(width: 8),
+               Text(
+                 'Confirmar borrado',
+                 style: TextStyle(fontSize: 16),
+               ),
+             ],
+           ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '¿Estás seguro de que quieres borrar el mes completo?',
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Mes: $fecha',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal.shade700,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Esta acción:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('• Borrará todos los comprobantes del mes'),
+                      Text('• Eliminará todos los archivos asociados'),
+                      Text('• No se puede deshacer'),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Text(
+                    '⚠️ Esta acción es irreversible',
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _borrarMesCompleto(fecha);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('BORRAR'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Método para borrar el mes completo
+  Future<void> _borrarMesCompleto(String fecha) async {
+    try {
+      setState(() {
+        cargando = true;
+      });
+
+      // Mostrar indicador de progreso
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Borrando mes...'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Borrando $fecha...'),
+              ],
+            ),
+          );
+        },
+      );
+
+      // 1. Obtener todos los comprobantes del mes
+      final comprobantes = await ComprobanteService.obtenerPorFecha(fecha);
+      
+      // 2. Borrar todos los archivos físicos
+      for (final comprobante in comprobantes) {
+        try {
+          await ArchivoService.eliminarArchivo(comprobante.nombre, fecha);
+        } catch (e) {
+          print('Error al borrar archivo: $e');
+        }
+      }
+      
+             // 3. Borrar todos los comprobantes de la base de datos
+       for (final comprobante in comprobantes) {
+         await ComprobanteService.eliminarComprobante(comprobante.nombre, fecha);
+       }
+      
+      // 4. Intentar eliminar la carpeta del mes si está vacía
+      try {
+        await ArchivoService.eliminarCarpeta(fecha);
+      } catch (e) {
+        print('Error al eliminar carpeta: $e');
+      }
+
+      // Cerrar el diálogo de progreso
+      Navigator.pop(context);
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✅ Mes $fecha borrado completamente'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      // Recargar la lista de comprobantes
+      await _cargarComprobantesPorFecha();
+      
+      setState(() {
+        cargando = false;
+      });
+
+    } catch (e) {
+      // Cerrar el diálogo de progreso si hay error
+      Navigator.pop(context);
+      
+      // Mostrar mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error al borrar el mes: $e'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      
+      setState(() {
+        cargando = false;
+      });
+    }
+  }
+
   Future<void> _cargarComprobantesPorFecha() async {
     comprobantesPorFecha.clear();
     final List<Future<void>> futures = [];
+    
+    // Mostrar 12 meses desde la fecha de inicio
     for (int i = 0; i < 12; i++) {
       int mes = (mesInicio! + i) % 12;
       int anio = anioInicio! + ((mesInicio! + i) ~/ 12);
@@ -91,6 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
         comprobantesPorFecha[fecha] = lista.length;
       }));
     }
+    
     await Future.wait(futures);
   }
 
@@ -166,24 +356,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return Scaffold(
         appBar: AppBar(
-        title: Text(
-          'Recibido!',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            letterSpacing: 1.2,
-          ),
-        ),
+                 title: Text(
+           'Recibido!',
+           style: TextStyle(
+             fontSize: 28,
+             fontWeight: FontWeight.w600,
+             color: Colors.white,
+             letterSpacing: 1.2,
+           ),
+         ),
         centerTitle: true,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.amberAccent),
-            tooltip: 'Elegir mes/año de inicio',
-            onPressed: _mostrarSelectorMesAnio,
-          ),
-        ],
+                 actions: [
+           IconButton(
+             icon: Icon(Icons.settings, color: Colors.amberAccent),
+             tooltip: 'Elegir mes/año de inicio',
+             onPressed: _mostrarSelectorMesAnio,
+           ),
+         ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -204,13 +394,13 @@ class _HomeScreenState extends State<HomeScreen> {
           Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  itemCount: 12,
-                  itemBuilder: (context, index) {
-                    int mes = (mesInicio! + index) % 12;
-                    int anio = anioInicio! + ((mesInicio! + index) ~/ 12);
-                    String fecha = "${meses[mes]} $anio";
-                    int cantidad = comprobantesPorFecha[fecha] ?? 0;
+                                 child: ListView.builder(
+                   itemCount: 12,
+                   itemBuilder: (context, index) {
+                     int mes = (mesInicio! + index) % 12;
+                     int anio = anioInicio! + ((mesInicio! + index) ~/ 12);
+                     String fecha = "${meses[mes]} $anio";
+                     int cantidad = comprobantesPorFecha[fecha] ?? 0;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                       child: Card(
@@ -218,24 +408,54 @@ class _HomeScreenState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         color: Colors.teal.shade100,
-                        child: ListTile(
-                          title: Text(
-                            '$fecha',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                                                 child: ListTile(
+                           title: Text(
+                             '$fecha',
+                             style: const TextStyle(
+                               fontSize: 18,
+                               fontWeight: FontWeight.bold,
+                             ),
+                           ),
+                           subtitle: Text('Comprobantes: $cantidad'),
+                                                       trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Botón de eliminar con mejor espaciado
+                                Container(
+                                  margin: EdgeInsets.only(right: 16),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red.shade400,
+                                      size: 22,
+                                    ),
+                                    onPressed: () => _mostrarConfirmacionBorrar(fecha),
+                                    tooltip: 'Borrar mes completo',
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: Colors.red.shade50,
+                                      padding: EdgeInsets.all(8),
+                                    ),
+                                  ),
+                                ),
+                                // Flecha de navegación más separada
+                                Container(
+                                  margin: EdgeInsets.only(right: 8),
+                                  child: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.teal.shade600,
+                                    size: 18,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          subtitle: Text('Comprobantes: $cantidad'),
-                          trailing: const Icon(Icons.arrow_forward_ios),
-                          onTap: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/monthDetail',
-                              arguments: {'mes': meses[mes], 'anio': anio},
-                            );
-                          },
-                        ),
+                           onTap: () {
+                             Navigator.pushNamed(
+                               context,
+                               '/monthDetail',
+                               arguments: {'mes': meses[mes], 'anio': anio},
+                             );
+                           },
+                         ),
                       ),
                     );
                   },
