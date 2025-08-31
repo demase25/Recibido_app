@@ -38,9 +38,9 @@ class MainActivity : FlutterActivity() {
     }
     
     private fun setupSystemBarColors(windowInsetsController: WindowInsetsControllerCompat) {
-        // Colores basados en la paleta de la app (teal pastel)
-        val primaryColor = android.graphics.Color.parseColor("#26A69A") // teal.shade400
-        val primaryDarkColor = android.graphics.Color.parseColor("#00796B") // teal.shade800
+        // Colores basados en la nueva paleta de la app (celeste pastel)
+        val primaryColor = android.graphics.Color.parseColor("#A8D8EA") // celeste pastel principal
+        val primaryDarkColor = android.graphics.Color.parseColor("#8BC4D9") // celeste pastel oscuro
         
         // Configurar barra de estado (reemplaza setStatusBarColor obsoleto)
         window.statusBarColor = android.graphics.Color.TRANSPARENT

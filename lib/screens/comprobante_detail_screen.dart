@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import '../models/comprobante.dart';
 import '../services/comprobante_service.dart';
 import '../services/archivo_service.dart';
+import '../constants/app_colors.dart';
 
 class ComprobanteDetailScreen extends StatefulWidget {
   @override
@@ -38,9 +39,9 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.teal.shade400,
-                Colors.teal.shade600,
-                Colors.teal.shade800,
+                AppColors.primary,
+                AppColors.primaryDark,
+                AppColors.primaryDarker,
               ],
             ),
           ),
@@ -71,7 +72,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                             ? Icons.picture_as_pdf 
                             : Icons.image,
                         size: 32,
-                        color: Colors.teal,
+                        color: AppColors.primary,
                       ),
                       SizedBox(width: 12),
                       Expanded(

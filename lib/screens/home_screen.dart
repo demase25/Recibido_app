@@ -9,6 +9,7 @@ import '../services/shared_files_service.dart';
 import '../models/comprobante.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../constants/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -117,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.teal.shade700,
+                    color: AppColors.primaryDarker,
                   ),
                 ),
                 SizedBox(height: 8),
@@ -380,9 +381,9 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.teal.shade400,
-                Colors.teal.shade600,
-                Colors.teal.shade800,
+                AppColors.primary,
+                AppColors.primaryDark,
+                AppColors.primaryDarker,
               ],
             ),
           ),
@@ -407,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        color: Colors.teal.shade100,
+                        color: AppColors.primaryLight,
                                                  child: ListTile(
                            title: Text(
                              '$fecha',
@@ -442,7 +443,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   margin: EdgeInsets.only(right: 8),
                                   child: Icon(
                                     Icons.arrow_forward_ios,
-                                    color: Colors.teal.shade600,
+                                    color: AppColors.primaryDark,
                                     size: 18,
                                   ),
                                 ),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../models/comprobante.dart';
 import '../services/comprobante_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import '../constants/app_colors.dart';
 
 class MonthDetailScreen extends StatefulWidget {
   @override
