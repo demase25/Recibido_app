@@ -40,6 +40,11 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Soporte para dispositivos con páginas de memoria de 16 KB
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -47,6 +52,18 @@ android {
             signingConfig = signingConfigs.getByName("release")
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            
+            // Configuración para soporte de 16 KB
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
+        }
+    }
+    
+    // Configuración para soporte de 16 KB de memoria
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
         }
     }
 }
