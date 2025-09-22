@@ -1,0 +1,270 @@
+{
+  "@@locale": "es",
+  "appTitle": "Recibido!",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeMessage": "Bienvenido a Recibido!",
+  "@welcomeMessage": {
+    "description": "Welcome message shown to users"
+  },
+  "instructionTitle": "Instrucciones",
+  "@instructionTitle": {
+    "description": "Title for instruction screen"
+  },
+  "instructionText": "Toca cualquier carpeta de mes para ver tus comprobantes guardados.\n\nPuedes compartir, eliminar o ver cada comprobante individualmente.\n\n¡Toca la pantalla para continuar!",
+  "@instructionText": {
+    "description": "Instruction text explaining how to use the app"
+  },
+  "tapToContinue": "Toca la pantalla para continuar",
+  "@tapToContinue": {
+    "description": "Text telling user to tap screen to continue"
+  },
+  "monthReceipts": "Comprobantes de {month} {year}",
+  "@monthReceipts": {
+    "description": "Title showing month and year for receipts",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteMonth": "Borrar mes completo",
+  "@deleteMonth": {
+    "description": "Button to delete entire month"
+  },
+  "confirmDelete": "Confirmar borrado",
+  "@confirmDelete": {
+    "description": "Title for delete confirmation dialog"
+  },
+  "deleteConfirmationMessage": "¿Estás seguro de que quieres borrar todos los comprobantes de {month} {year}?\n\nEsta acción no se puede deshacer.",
+  "@deleteConfirmationMessage": {
+    "description": "Confirmation message for deleting month",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "delete": "Borrar",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "noReceipts": "No hay comprobantes en este mes",
+  "@noReceipts": {
+    "description": "Message when no receipts found for a month"
+  },
+  "share": "Compartir",
+  "@share": {
+    "description": "Share button"
+  },
+  "deleteReceipt": "Eliminar",
+  "@deleteReceipt": {
+    "description": "Delete receipt button"
+  },
+  "viewReceipt": "Ver",
+  "@viewReceipt": {
+    "description": "View receipt button"
+  },
+  "savedSuccessfully": "Comprobante guardado exitosamente",
+  "@savedSuccessfully": {
+    "description": "Success message when receipt is saved"
+  },
+  "errorSaving": "Error al guardar el comprobante",
+  "@errorSaving": {
+    "description": "Error message when saving fails"
+  },
+  "language": "Idioma",
+  "@language": {
+    "description": "Language setting"
+  },
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Spanish language option"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  "monthJanuary": "Enero",
+  "@monthJanuary": {
+    "description": "January month name"
+  },
+  "monthFebruary": "Febrero",
+  "@monthFebruary": {
+    "description": "February month name"
+  },
+  "monthMarch": "Marzo",
+  "@monthMarch": {
+    "description": "March month name"
+  },
+  "monthApril": "Abril",
+  "@monthApril": {
+    "description": "April month name"
+  },
+  "monthMay": "Mayo",
+  "@monthMay": {
+    "description": "May month name"
+  },
+  "monthJune": "Junio",
+  "@monthJune": {
+    "description": "June month name"
+  },
+  "monthJuly": "Julio",
+  "@monthJuly": {
+    "description": "July month name"
+  },
+  "monthAugust": "Agosto",
+  "@monthAugust": {
+    "description": "August month name"
+  },
+  "monthSeptember": "Septiembre",
+  "@monthSeptember": {
+    "description": "September month name"
+  },
+  "monthOctober": "Octubre",
+  "@monthOctober": {
+    "description": "October month name"
+  },
+  "monthNovember": "Noviembre",
+  "@monthNovember": {
+    "description": "November month name"
+  },
+  "monthDecember": "Diciembre",
+  "@monthDecember": {
+    "description": "December month name"
+  },
+  "receiptDetail": "Detalle del Comprobante",
+  "@receiptDetail": {
+    "description": "Title for receipt detail screen"
+  },
+  "fileName": "Nombre del archivo",
+  "@fileName": {
+    "description": "Label for file name"
+  },
+  "uploadDate": "Fecha de carga",
+  "@uploadDate": {
+    "description": "Label for upload date"
+  },
+  "availableActions": "Acciones disponibles",
+  "@availableActions": {
+    "description": "Title for available actions section"
+  },
+  "shareFile": "Compartir",
+  "@shareFile": {
+    "description": "Share file button"
+  },
+  "openWith": "Abrir con",
+  "@openWith": {
+    "description": "Open with button"
+  },
+  "renameFile": "Renombrar",
+  "@renameFile": {
+    "description": "Rename file button"
+  },
+  "deleteFile": "Eliminar",
+  "@deleteFile": {
+    "description": "Delete file button"
+  },
+  "renameFileTitle": "Renombrar archivo",
+  "@renameFileTitle": {
+    "description": "Title for rename dialog"
+  },
+  "newFileName": "Nuevo nombre del archivo",
+  "@newFileName": {
+    "description": "Label for new file name input"
+  },
+  "fileNameHint": "Ej: nuevo_nombre.pdf",
+  "@fileNameHint": {
+    "description": "Hint text for file name input"
+  },
+  "confirmDeletion": "Confirmar eliminación",
+  "@confirmDeletion": {
+    "description": "Title for delete confirmation dialog"
+  },
+  "confirmDeleteFile": "¿Estás seguro de que quieres eliminar \"{fileName}\"?",
+  "@confirmDeleteFile": {
+    "description": "Confirmation message for file deletion",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "fileNameEmpty": "El nombre del archivo no puede estar vacío.",
+  "@fileNameEmpty": {
+    "description": "Error message when file name is empty"
+  },
+  "fileRenamed": "Archivo renombrado correctamente.",
+  "@fileRenamed": {
+    "description": "Success message when file is renamed"
+  },
+  "fileDeleted": "Archivo eliminado correctamente",
+  "@fileDeleted": {
+    "description": "Success message when file is deleted"
+  },
+  "errorRenaming": "Error al renombrar: {error}",
+  "@errorRenaming": {
+    "description": "Error message when renaming fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Error al eliminar: {error}",
+  "@errorDeleting": {
+    "description": "Error message when deletion fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSharing": "Error al compartir archivo: {error}",
+  "@errorSharing": {
+    "description": "Error message when sharing fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpening": "Error al abrir el archivo: {error}",
+  "@errorOpening": {
+    "description": "Error message when opening file fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotOpenFile": "No se pudo abrir el archivo: {message}",
+  "@cannotOpenFile": {
+    "description": "Error message when file cannot be opened",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "shareFileText": "Compartir archivo: {fileName}",
+  "@shareFileText": {
+    "description": "Text for sharing file",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  }
+}

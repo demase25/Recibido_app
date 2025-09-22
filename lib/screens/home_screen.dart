@@ -3,13 +3,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 
-import '../services/archivo_service.dart';
 import '../services/comprobante_service.dart';
 import '../services/shared_files_service.dart';
+import '../services/archivo_service.dart';
 import '../models/comprobante.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
+import '../widgets/language_selector.dart';
+import '../widgets/language_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,10 +20,61 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<String> meses = const [
+  // Meses en español para almacenamiento interno (siempre consistentes)
+  static const List<String> _mesesEspanol = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
+  
+  // Meses traducidos para mostrar en la interfaz
+  List<String> _getMeses(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      l10n.monthJanuary, l10n.monthFebruary, l10n.monthMarch, l10n.monthApril,
+      l10n.monthMay, l10n.monthJune, l10n.monthJuly, l10n.monthAugust,
+      l10n.monthSeptember, l10n.monthOctober, l10n.monthNovember, l10n.monthDecember
+    ];
+  }
+  
+  // Función para obtener el nombre del mes en español (para almacenamiento)
+  String _getMesEspanol(int mesIndex) {
+    return _mesesEspanol[mesIndex];
+  }
+  
+  // Función para obtener el nombre del mes traducido (para mostrar)
+  String _getMesTraducido(BuildContext context, int mesIndex) {
+    final meses = _getMeses(context);
+    return meses[mesIndex];
+  }
+  
+  // Función para convertir fecha traducida a fecha en español
+  String _convertirFechaATraducida(String fechaEspanol) {
+    final partes = fechaEspanol.split(' ');
+    final mesEspanol = partes[0];
+    final anio = partes[1];
+
+    // Encontrar el índice del mes en español
+    int mesIndex = _mesesEspanol.indexOf(mesEspanol);
+    if (mesIndex == -1) return fechaEspanol; // Si no se encuentra, devolver original
+
+    // Convertir a fecha traducida
+    return "${_getMesTraducido(context, mesIndex)} $anio";
+  }
+  
+  // Función para convertir fecha traducida a fecha en español
+  String _convertirFechaAEspanol(String fechaTraducida) {
+    final partes = fechaTraducida.split(' ');
+    final mesTraducido = partes[0];
+    final anio = partes[1];
+
+    // Buscar el mes traducido en la lista actual
+    final meses = _getMeses(context);
+    int mesIndex = meses.indexOf(mesTraducido);
+    if (mesIndex == -1) return fechaTraducida; // Si no se encuentra, devolver original
+
+    // Convertir a fecha en español
+    return "${_getMesEspanol(mesIndex)} $anio";
+  }
 
   int? mesInicio; // 0-based
   int? anioInicio;
@@ -28,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, int> comprobantesPorFecha = {};
   BannerAd? _bannerAd;
   bool _mostrarInstructivo = true; // Controla si mostrar la foto instructiva
+  String? _idiomaActual; // Para rastrear cambios de idioma
 
   @override
   void initState() {
@@ -35,6 +90,26 @@ class _HomeScreenState extends State<HomeScreen> {
     _cargarPreferencias();
     _processSharedFiles();
     _inicializarBanner();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Solo recargar datos cuando cambie el idioma
+    final languageProvider = LanguageProvider.of(context);
+    final nuevoIdioma = languageProvider?.currentLocale.languageCode;
+    
+    if (_idiomaActual != null && _idiomaActual != nuevoIdioma) {
+      // El idioma cambió, recargar datos
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && mesInicio != null && anioInicio != null) {
+          _cargarComprobantesPorFecha();
+        }
+      });
+    }
+    
+    _idiomaActual = nuevoIdioma;
   }
 
   @override
@@ -54,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _ocultarInstructivo() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('mostrarInstructivo', false);
+    await prefs.setBool('instructivoVisto', true);
     setState(() {
       _mostrarInstructivo = false;
     });
@@ -65,7 +140,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       mesInicio = prefs.getInt('mesInicio') ?? DateTime.now().month - 1;
       anioInicio = prefs.getInt('anioInicio') ?? DateTime.now().year;
-      _mostrarInstructivo = prefs.getBool('mostrarInstructivo') ?? true;
+      // Solo mostrar instructivo si es la primera vez que se abre la app
+      _mostrarInstructivo = prefs.getBool('instructivoVisto') != true;
     });
     await _cargarComprobantesPorFecha();
     setState(() { cargando = false; });
@@ -87,55 +163,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   // Método para mostrar confirmación de borrado
-  void _mostrarConfirmacionBorrar(String fecha) {
+  void _mostrarConfirmacionBorrar(String fechaTraducida) {
+    final l10n = AppLocalizations.of(context)!;
+    // Convertir fecha traducida a fecha en español para el borrado
+    final fechaEspanol = _convertirFechaAEspanol(fechaTraducida);
+    final partesFecha = fechaEspanol.split(' ');
+    final mes = partesFecha[0];
+    final anio = int.parse(partesFecha[1]);
+    
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-                     title: Row(
-             mainAxisSize: MainAxisSize.min,
-             children: [
-               Icon(Icons.warning, color: Colors.orange, size: 20),
-               SizedBox(width: 8),
-               Text(
-                 'Confirmar borrado',
-                 style: TextStyle(fontSize: 16),
-               ),
-             ],
-           ),
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning, color: Colors.orange, size: 20),
+              SizedBox(width: 8),
+              Text(
+                l10n.confirmDelete,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '¿Estás seguro de que quieres borrar el mes completo?',
+                  l10n.deleteConfirmationMessage(mes, anio),
                   style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Mes: $fecha',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryDarker,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Esta acción:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('• Borrará todos los comprobantes del mes'),
-                      Text('• Eliminará todos los archivos asociados'),
-                      Text('• No se puede deshacer'),
-                    ],
-                  ),
                 ),
                 SizedBox(height: 8),
                 Container(
@@ -161,18 +219,18 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                _borrarMesCompleto(fecha);
+                _borrarMesCompleto(fechaEspanol);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: Text('BORRAR'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -181,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Método para borrar el mes completo
-  Future<void> _borrarMesCompleto(String fecha) async {
+  Future<void> _borrarMesCompleto(String fechaEspanol) async {
     try {
       setState(() {
         cargando = true;
@@ -199,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
-                Text('Borrando $fecha...'),
+                Text('Borrando $fechaEspanol...'),
               ],
             ),
           );
@@ -207,12 +265,12 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       // 1. Obtener todos los comprobantes del mes
-      final comprobantes = await ComprobanteService.obtenerPorFecha(fecha);
+      final comprobantes = await ComprobanteService.obtenerPorFecha(fechaEspanol);
       
       // 2. Borrar todos los archivos físicos
       for (final comprobante in comprobantes) {
         try {
-          await ArchivoService.eliminarArchivo(comprobante.nombre, fecha);
+          await ArchivoService.eliminarArchivo(comprobante.nombre, fechaEspanol);
         } catch (e) {
           print('Error al borrar archivo: $e');
         }
@@ -220,12 +278,12 @@ class _HomeScreenState extends State<HomeScreen> {
       
              // 3. Borrar todos los comprobantes de la base de datos
        for (final comprobante in comprobantes) {
-         await ComprobanteService.eliminarComprobante(comprobante.nombre, fecha);
+         await ComprobanteService.eliminarComprobante(comprobante.nombre, fechaEspanol);
        }
       
       // 4. Intentar eliminar la carpeta del mes si está vacía
       try {
-        await ArchivoService.eliminarCarpeta(fecha);
+        await ArchivoService.eliminarCarpeta(fechaEspanol);
       } catch (e) {
         print('Error al eliminar carpeta: $e');
       }
@@ -236,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✅ Mes $fecha borrado completamente'),
+          content: Text('✅ Mes $fechaEspanol borrado completamente'),
           backgroundColor: Colors.green,
           duration: Duration(seconds: 3),
         ),
@@ -276,13 +334,22 @@ class _HomeScreenState extends State<HomeScreen> {
     for (int i = 0; i < 12; i++) {
       int mes = (mesInicio! + i) % 12;
       int anio = anioInicio! + ((mesInicio! + i) ~/ 12);
-      String fecha = "${meses[mes]} $anio";
-      futures.add(ComprobanteService.obtenerPorFecha(fecha).then((lista) {
-        comprobantesPorFecha[fecha] = lista.length;
+      // Usar nombres en español para almacenamiento interno
+      String fechaEspanol = "${_getMesEspanol(mes)} $anio";
+      // Usar nombres traducidos para mostrar en la interfaz
+      String fechaTraducida = "${_getMesTraducido(context, mes)} $anio";
+      
+      futures.add(ComprobanteService.obtenerPorFecha(fechaEspanol).then((lista) {
+        comprobantesPorFecha[fechaTraducida] = lista.length;
       }));
     }
     
     await Future.wait(futures);
+    
+    // Asegurar que el estado se actualice
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _processSharedFiles() async {
@@ -305,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 isExpanded: true,
                 items: List.generate(12, (i) => DropdownMenuItem(
                   value: i,
-                  child: Text(meses[i]),
+                  child: Text(_getMeses(context)[i]),
                 )),
                 onChanged: (v) {
                   if (v != null) {
@@ -349,6 +416,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Escuchar cambios del LanguageProvider para recargar datos cuando cambie el idioma
+    final languageProvider = LanguageProvider.of(context);
+    
     if (cargando || mesInicio == null || anioInicio == null) {
       return Scaffold(
         appBar: AppBar(title: Text('Recibido!')),
@@ -357,24 +427,25 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     return Scaffold(
         appBar: AppBar(
-                 title: Text(
-           'Recibido!',
-           style: TextStyle(
-             fontSize: 28,
-             fontWeight: FontWeight.w600,
-             color: Colors.white,
-             letterSpacing: 1.2,
-           ),
-         ),
-        centerTitle: true,
-        elevation: 0,
-                 actions: [
-           IconButton(
-             icon: Icon(Icons.settings, color: Colors.amberAccent),
-             tooltip: 'Elegir mes/año de inicio',
-             onPressed: _mostrarSelectorMesAnio,
-           ),
-         ],
+          title: Text(
+            AppLocalizations.of(context)!.appTitle,
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 1.2,
+            ),
+          ),
+          centerTitle: true,
+          elevation: 0,
+          actions: [
+            LanguageSelector(),
+            IconButton(
+              icon: Icon(Icons.settings, color: Colors.amberAccent),
+              tooltip: 'Elegir mes/año de inicio',
+              onPressed: _mostrarSelectorMesAnio,
+            ),
+          ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -400,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
                    itemBuilder: (context, index) {
                      int mes = (mesInicio! + index) % 12;
                      int anio = anioInicio! + ((mesInicio! + index) ~/ 12);
-                     String fecha = "${meses[mes]} $anio";
+                     String fecha = "${_getMeses(context)[mes]} $anio";
                      int cantidad = comprobantesPorFecha[fecha] ?? 0;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -417,7 +488,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                fontWeight: FontWeight.bold,
                              ),
                            ),
-                           subtitle: Text('Comprobantes: $cantidad'),
+                           subtitle: Text('${AppLocalizations.of(context)!.monthReceipts('', 0).split(' ')[0]}: $cantidad'),
                                                        trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -431,7 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       size: 22,
                                     ),
                                     onPressed: () => _mostrarConfirmacionBorrar(fecha),
-                                    tooltip: 'Borrar mes completo',
+                                    tooltip: AppLocalizations.of(context)!.deleteMonth,
                                     style: IconButton.styleFrom(
                                       backgroundColor: Colors.red.shade50,
                                       padding: EdgeInsets.all(8),
@@ -453,7 +524,7 @@ class _HomeScreenState extends State<HomeScreen> {
                              Navigator.pushNamed(
                                context,
                                '/monthDetail',
-                               arguments: {'mes': meses[mes], 'anio': anio},
+                               arguments: {'mes': _getMesEspanol(mes), 'anio': anio},
                              );
                            },
                          ),
@@ -509,8 +580,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        child: const Text(
-                          'Toca la pantalla para continuar',
+                        child: Text(
+                          AppLocalizations.of(context)!.tapToContinue,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -537,9 +608,9 @@ class _HomeScreenState extends State<HomeScreen> {
             final archivo = File(resultado.files.single.path!);
             final nombre = resultado.files.single.name;
 
-            final mesActual = meses[DateTime.now().month - 1];
+            final mesActual = _getMesEspanol(DateTime.now().month - 1);
             final anioActual = DateTime.now().year;
-            final fecha = '$mesActual $anioActual'; // Ej: Julio 2025
+            final fecha = '$mesActual $anioActual'; // Ej: Julio 2025 (siempre en español)
 
             final ruta = await ArchivoService.guardarArchivo(archivo, nombre, fecha);
 
@@ -552,10 +623,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Mostrar mensaje
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('¡Archivo guardado con éxito!')),
+              SnackBar(content: Text(AppLocalizations.of(context)!.savedSuccessfully)),
             );
+            
+            // Recargar datos y actualizar UI
             await _cargarComprobantesPorFecha();
-            setState(() {});
+            if (mounted) {
+              setState(() {});
+            }
           }
         },
       ),

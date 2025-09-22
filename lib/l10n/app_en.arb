@@ -1,0 +1,270 @@
+{
+  "@@locale": "en",
+  "appTitle": "Received!",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeMessage": "Welcome to Received!",
+  "@welcomeMessage": {
+    "description": "Welcome message shown to users"
+  },
+  "instructionTitle": "Instructions",
+  "@instructionTitle": {
+    "description": "Title for instruction screen"
+  },
+  "instructionText": "Tap any month folder to view your saved receipts.\n\nYou can share, delete or view each receipt individually.\n\nTap the screen to continue!",
+  "@instructionText": {
+    "description": "Instruction text explaining how to use the app"
+  },
+  "tapToContinue": "Tap the screen to continue",
+  "@tapToContinue": {
+    "description": "Text telling user to tap screen to continue"
+  },
+  "monthReceipts": "Receipts for {month} {year}",
+  "@monthReceipts": {
+    "description": "Title showing month and year for receipts",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteMonth": "Delete entire month",
+  "@deleteMonth": {
+    "description": "Button to delete entire month"
+  },
+  "confirmDelete": "Confirm deletion",
+  "@confirmDelete": {
+    "description": "Title for delete confirmation dialog"
+  },
+  "deleteConfirmationMessage": "Are you sure you want to delete all receipts from {month} {year}?\n\nThis action cannot be undone.",
+  "@deleteConfirmationMessage": {
+    "description": "Confirmation message for deleting month",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "noReceipts": "No receipts found for this month",
+  "@noReceipts": {
+    "description": "Message when no receipts found for a month"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Share button"
+  },
+  "deleteReceipt": "Delete",
+  "@deleteReceipt": {
+    "description": "Delete receipt button"
+  },
+  "viewReceipt": "View",
+  "@viewReceipt": {
+    "description": "View receipt button"
+  },
+  "savedSuccessfully": "Receipt saved successfully",
+  "@savedSuccessfully": {
+    "description": "Success message when receipt is saved"
+  },
+  "errorSaving": "Error saving receipt",
+  "@errorSaving": {
+    "description": "Error message when saving fails"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language setting"
+  },
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Spanish language option"
+  },
+  "english": "English",
+  "@english": {
+    "description": "English language option"
+  },
+  "monthJanuary": "January",
+  "@monthJanuary": {
+    "description": "January month name"
+  },
+  "monthFebruary": "February",
+  "@monthFebruary": {
+    "description": "February month name"
+  },
+  "monthMarch": "March",
+  "@monthMarch": {
+    "description": "March month name"
+  },
+  "monthApril": "April",
+  "@monthApril": {
+    "description": "April month name"
+  },
+  "monthMay": "May",
+  "@monthMay": {
+    "description": "May month name"
+  },
+  "monthJune": "June",
+  "@monthJune": {
+    "description": "June month name"
+  },
+  "monthJuly": "July",
+  "@monthJuly": {
+    "description": "July month name"
+  },
+  "monthAugust": "August",
+  "@monthAugust": {
+    "description": "August month name"
+  },
+  "monthSeptember": "September",
+  "@monthSeptember": {
+    "description": "September month name"
+  },
+  "monthOctober": "October",
+  "@monthOctober": {
+    "description": "October month name"
+  },
+  "monthNovember": "November",
+  "@monthNovember": {
+    "description": "November month name"
+  },
+  "monthDecember": "December",
+  "@monthDecember": {
+    "description": "December month name"
+  },
+  "receiptDetail": "Receipt Details",
+  "@receiptDetail": {
+    "description": "Title for receipt detail screen"
+  },
+  "fileName": "File name",
+  "@fileName": {
+    "description": "Label for file name"
+  },
+  "uploadDate": "Upload date",
+  "@uploadDate": {
+    "description": "Label for upload date"
+  },
+  "availableActions": "Available actions",
+  "@availableActions": {
+    "description": "Title for available actions section"
+  },
+  "shareFile": "Share",
+  "@shareFile": {
+    "description": "Share file button"
+  },
+  "openWith": "Open with",
+  "@openWith": {
+    "description": "Open with button"
+  },
+  "renameFile": "Rename",
+  "@renameFile": {
+    "description": "Rename file button"
+  },
+  "deleteFile": "Delete",
+  "@deleteFile": {
+    "description": "Delete file button"
+  },
+  "renameFileTitle": "Rename file",
+  "@renameFileTitle": {
+    "description": "Title for rename dialog"
+  },
+  "newFileName": "New file name",
+  "@newFileName": {
+    "description": "Label for new file name input"
+  },
+  "fileNameHint": "E.g: new_name.pdf",
+  "@fileNameHint": {
+    "description": "Hint text for file name input"
+  },
+  "confirmDeletion": "Confirm deletion",
+  "@confirmDeletion": {
+    "description": "Title for delete confirmation dialog"
+  },
+  "confirmDeleteFile": "Are you sure you want to delete \"{fileName}\"?",
+  "@confirmDeleteFile": {
+    "description": "Confirmation message for file deletion",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "fileNameEmpty": "The file name cannot be empty.",
+  "@fileNameEmpty": {
+    "description": "Error message when file name is empty"
+  },
+  "fileRenamed": "File renamed successfully.",
+  "@fileRenamed": {
+    "description": "Success message when file is renamed"
+  },
+  "fileDeleted": "File deleted successfully",
+  "@fileDeleted": {
+    "description": "Success message when file is deleted"
+  },
+  "errorRenaming": "Error renaming: {error}",
+  "@errorRenaming": {
+    "description": "Error message when renaming fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Error deleting: {error}",
+  "@errorDeleting": {
+    "description": "Error message when deletion fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSharing": "Error sharing file: {error}",
+  "@errorSharing": {
+    "description": "Error message when sharing fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorOpening": "Error opening file: {error}",
+  "@errorOpening": {
+    "description": "Error message when opening file fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cannotOpenFile": "Could not open file: {message}",
+  "@cannotOpenFile": {
+    "description": "Error message when file cannot be opened",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "shareFileText": "Share file: {fileName}",
+  "@shareFileText": {
+    "description": "Text for sharing file",
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  }
+}

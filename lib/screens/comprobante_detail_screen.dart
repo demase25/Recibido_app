@@ -5,6 +5,7 @@ import '../models/comprobante.dart';
 import '../services/comprobante_service.dart';
 import '../services/archivo_service.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 
 class ComprobanteDetailScreen extends StatefulWidget {
   @override
@@ -29,9 +30,11 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalle del Comprobante'),
+        title: Text(l10n.receiptDetail),
         elevation: 0,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -77,7 +80,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Nombre del archivo',
+                          l10n.fileName,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade600,
@@ -106,7 +109,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                       ),
                       SizedBox(width: 8),
                       Text(
-                        'Fecha de carga',
+                        l10n.uploadDate,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -132,7 +135,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
             
             // Título de acciones
             Text(
-              'Acciones disponibles',
+              l10n.availableActions,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -151,7 +154,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                   child: ElevatedButton.icon(
                     icon: Icon(Icons.share, color: Colors.white),
                     label: Text(
-                      'Compartir',
+                      l10n.shareFile,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -171,11 +174,11 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                         final ruta = await ArchivoService.obtenerRutaArchivo(nombre, fecha);
                         await Share.shareXFiles(
                           [XFile(ruta)],
-                          text: 'Compartir archivo: $nombre',
+                          text: l10n.shareFileText(nombre),
                         );
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error al compartir archivo: $e')),
+                          SnackBar(content: Text(l10n.errorSharing(e.toString()))),
                         );
                       }
                     },
@@ -187,7 +190,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                   child: ElevatedButton.icon(
                     icon: Icon(Icons.open_in_new, color: Colors.white),
                     label: Text(
-                      'Abrir con',
+                      l10n.openWith,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -208,12 +211,12 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                         final result = await OpenFile.open(ruta);
                         if (result.type != ResultType.done) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('No se pudo abrir el archivo: ${result.message}')),
+                            SnackBar(content: Text(l10n.cannotOpenFile(result.message))),
                           );
                         }
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error al abrir el archivo: $e')),
+                          SnackBar(content: Text(l10n.errorOpening(e.toString()))),
                         );
                       }
                     },
@@ -225,7 +228,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                   child: ElevatedButton.icon(
                     icon: Icon(Icons.edit, color: Colors.white),
                     label: Text(
-                      'Renombrar',
+                      l10n.renameFile,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -251,7 +254,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                   child: ElevatedButton.icon(
                     icon: Icon(Icons.delete, color: Colors.white),
                     label: Text(
-                      'Eliminar',
+                      l10n.deleteFile,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -280,6 +283,7 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
   }
 
   void _mostrarDialogoRenombrar(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final TextEditingController _nuevoNombreController = TextEditingController();
     _nuevoNombreController.text = nombre;
 
@@ -287,25 +291,25 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Renombrar archivo'),
+          title: Text(l10n.renameFileTitle),
           content: TextField(
             controller: _nuevoNombreController,
             decoration: InputDecoration(
-              labelText: 'Nuevo nombre del archivo',
-              hintText: 'Ej: nuevo_nombre.pdf',
+              labelText: l10n.newFileName,
+              hintText: l10n.fileNameHint,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
                 final nuevoNombre = _nuevoNombreController.text;
                 if (nuevoNombre.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('El nombre del archivo no puede estar vacío.')),
+                    SnackBar(content: Text(l10n.fileNameEmpty)),
                   );
                   return;
                 }
@@ -317,16 +321,16 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                     nombre = nuevoNombre;
                   });
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Archivo renombrado correctamente.')),
+                    SnackBar(content: Text(l10n.fileRenamed)),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error al renombrar: $e')),
+                    SnackBar(content: Text(l10n.errorRenaming(e.toString()))),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              child: Text('Renombrar', style: TextStyle(color: Colors.white)),
+              child: Text(l10n.renameFile, style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -335,16 +339,18 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
   }
 
   void _mostrarDialogoEliminar(BuildContext context, String nombre, String fecha) {
+    final l10n = AppLocalizations.of(context)!;
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirmar eliminación'),
-          content: Text('¿Estás seguro de que quieres eliminar "$nombre"?'),
+          title: Text(l10n.confirmDeletion),
+          content: Text(l10n.confirmDeleteFile(nombre)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -353,16 +359,16 @@ class _ComprobanteDetailScreenState extends State<ComprobanteDetailScreen> {
                   await ComprobanteService.eliminarComprobante(nombre, fecha);
                   Navigator.of(context).pop(); // Volver a la pantalla anterior
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Archivo eliminado correctamente')),
+                    SnackBar(content: Text(l10n.fileDeleted)),
                   );
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error al eliminar: $e')),
+                    SnackBar(content: Text(l10n.errorDeleting(e.toString()))),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text('Eliminar', style: TextStyle(color: Colors.white)),
+              child: Text(l10n.delete, style: TextStyle(color: Colors.white)),
             ),
           ],
         );
