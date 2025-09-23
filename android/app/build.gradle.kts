@@ -65,6 +65,23 @@ android {
         jniLibs {
             useLegacyPackaging = false
         }
+        // Asegurar compatibilidad con 16KB
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    
+    // Configuración específica para 16KB
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = true
+        }
     }
 }
 
