@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permiso para ID de publicidad (requerido para Android 13+) -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    
     <application
         android:label="Recibido!"
         android:name="${applicationName}"
@@ -7,6 +9,11 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1255034608846557~3991811702"/>
+        
+        <!-- Declaración de uso del ID de publicidad para Android 13+ -->
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_ID_USAGE"
+            android:value="true" />
         
         <!-- Configuración para soporte de 16 KB de memoria -->
         <meta-data
