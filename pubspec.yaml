@@ -113,17 +113,17 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/recibido2.png"
+  image_path: "assets/icons/recibido3.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "assets/icons/recibido2.png"
+    image_path: "assets/icons/recibido3.png"
     background_color: "#A8D8EA"
     theme_color: "#A8D8EA"
   windows:
     generate: true
-    image_path: "assets/icons/recibido2.png"
+    image_path: "assets/icons/recibido3.png"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/icons/recibido2.png"
+    image_path: "assets/icons/recibido3.png"
