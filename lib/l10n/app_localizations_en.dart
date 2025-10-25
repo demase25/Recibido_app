@@ -188,4 +188,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String shareFileText(String fileName) {
     return 'Share file: $fileName';
   }
+
+  @override
+  String get exportMonth => 'Export month';
+
+  @override
+  String get exportYear => 'Export year';
+
+  @override
+  String get exportOptions => 'Export options';
+
+  @override
+  String get exportAsZip => 'Export as ZIP';
+
+  @override
+  String get exportAsPdf => 'Export as PDF summary';
+
+  @override
+  String get exporting => 'Exporting...';
+
+  @override
+  String get exportSuccess => 'Export completed successfully';
+
+  @override
+  String exportError(String error) {
+    return 'Error exporting: $error';
+  }
+
+  @override
+  String get noReceiptsToExport => 'No receipts to export';
 }

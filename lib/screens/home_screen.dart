@@ -6,6 +6,7 @@ import 'dart:io';
 import '../services/comprobante_service.dart';
 import '../services/shared_files_service.dart';
 import '../services/archivo_service.dart';
+import '../services/export_service.dart';
 import '../models/comprobante.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -356,6 +357,130 @@ class _HomeScreenState extends State<HomeScreen> {
     await SharedFilesService.processSharedFiles();
   }
 
+  void _mostrarOpcionesExportacionAnual() async {
+    // Obtener todos los comprobantes del año actual
+    final anioActual = DateTime.now().year;
+    final todosComprobantes = await ComprobanteService.cargarComprobantes();
+    final comprobantesAnio = todosComprobantes.where((c) => c.fecha.contains(anioActual.toString())).toList();
+    
+    if (comprobantesAnio.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.noReceiptsToExport)),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportOptions),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Exportar todos los comprobantes del año $anioActual'),
+              SizedBox(height: 10),
+              Text('Total: ${comprobantesAnio.length} comprobantes'),
+              SizedBox(height: 20),
+              ListTile(
+                leading: Icon(Icons.archive),
+                title: Text(AppLocalizations.of(context)!.exportAsZip),
+                subtitle: Text('Todos los comprobantes organizados por mes'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _exportarAnioComoZip(comprobantesAnio, anioActual);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.picture_as_pdf),
+                title: Text(AppLocalizations.of(context)!.exportAsPdf),
+                subtitle: Text('PDF resumen anual con miniaturas'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _exportarAnioComoPdf(comprobantesAnio, anioActual);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _exportarAnioComoZip(List<Comprobante> comprobantes, int anio) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text(AppLocalizations.of(context)!.exporting),
+              ],
+            ),
+          );
+        },
+      );
+
+      await ExportService.exportarAnioComoZip(comprobantes, anio);
+      
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportSuccess)),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportError(e.toString()))),
+      );
+    }
+  }
+
+  Future<void> _exportarAnioComoPdf(List<Comprobante> comprobantes, int anio) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text(AppLocalizations.of(context)!.exporting),
+              ],
+            ),
+          );
+        },
+      );
+
+      await ExportService.exportarAnioComoPdf(comprobantes, anio);
+      
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportSuccess)),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportError(e.toString()))),
+      );
+    }
+  }
+
   void _mostrarSelectorMesAnio() async {
     int mesSeleccionado = mesInicio ?? DateTime.now().month - 1;
     int anioSeleccionado = anioInicio ?? DateTime.now().year;
@@ -440,6 +565,11 @@ class _HomeScreenState extends State<HomeScreen> {
           elevation: 0,
           actions: [
             LanguageSelector(),
+            IconButton(
+              icon: Icon(Icons.file_download, color: Colors.white),
+              tooltip: AppLocalizations.of(context)!.exportYear,
+              onPressed: _mostrarOpcionesExportacionAnual,
+            ),
             IconButton(
               icon: Icon(Icons.settings, color: Colors.amberAccent),
               tooltip: 'Elegir mes/año de inicio',

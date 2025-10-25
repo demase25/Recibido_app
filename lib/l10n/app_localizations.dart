@@ -421,6 +421,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Compartir archivo: {fileName}'**
   String shareFileText(String fileName);
+
+  /// Button to export month receipts
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar mes'**
+  String get exportMonth;
+
+  /// Button to export year receipts
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar año'**
+  String get exportYear;
+
+  /// Title for export options dialog
+  ///
+  /// In es, this message translates to:
+  /// **'Opciones de exportación'**
+  String get exportOptions;
+
+  /// Export as ZIP option
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar como ZIP'**
+  String get exportAsZip;
+
+  /// Export as PDF summary option
+  ///
+  /// In es, this message translates to:
+  /// **'Exportar como PDF resumen'**
+  String get exportAsPdf;
+
+  /// Message shown while exporting
+  ///
+  /// In es, this message translates to:
+  /// **'Exportando...'**
+  String get exporting;
+
+  /// Success message when export is completed
+  ///
+  /// In es, this message translates to:
+  /// **'Exportación completada exitosamente'**
+  String get exportSuccess;
+
+  /// Error message when export fails
+  ///
+  /// In es, this message translates to:
+  /// **'Error al exportar: {error}'**
+  String exportError(String error);
+
+  /// Message when there are no receipts to export
+  ///
+  /// In es, this message translates to:
+  /// **'No hay comprobantes para exportar'**
+  String get noReceiptsToExport;
 }
 
 class _AppLocalizationsDelegate

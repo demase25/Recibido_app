@@ -266,5 +266,46 @@
         "type": "String"
       }
     }
+  },
+  "exportMonth": "Export month",
+  "@exportMonth": {
+    "description": "Button to export month receipts"
+  },
+  "exportYear": "Export year",
+  "@exportYear": {
+    "description": "Button to export year receipts"
+  },
+  "exportOptions": "Export options",
+  "@exportOptions": {
+    "description": "Title for export options dialog"
+  },
+  "exportAsZip": "Export as ZIP",
+  "@exportAsZip": {
+    "description": "Export as ZIP option"
+  },
+  "exportAsPdf": "Export as PDF summary",
+  "@exportAsPdf": {
+    "description": "Export as PDF summary option"
+  },
+  "exporting": "Exporting...",
+  "@exporting": {
+    "description": "Message shown while exporting"
+  },
+  "exportSuccess": "Export completed successfully",
+  "@exportSuccess": {
+    "description": "Success message when export is completed"
+  },
+  "exportError": "Error exporting: {error}",
+  "@exportError": {
+    "description": "Error message when export fails",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noReceiptsToExport": "No receipts to export",
+  "@noReceiptsToExport": {
+    "description": "Message when there are no receipts to export"
   }
 }

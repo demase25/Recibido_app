@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Color principal - Celeste pastel
-  static const Color primary = Color(0xFFA8D8EA);
+  // Color principal - Azul amigable y atrayente
+  static const Color primary = Color(0xFF4A90E2);
   
   // Variaciones del color principal
-  static const Color primaryLight = Color(0xFFC7E8F3);
-  static const Color primaryDark = Color(0xFF8BC4D9);
-  static const Color primaryDarker = Color(0xFF6BA8C0);
+  static const Color primaryLight = Color(0xFF7BB3F0);
+  static const Color primaryDark = Color(0xFF357ABD);
+  static const Color primaryDarker = Color(0xFF2C5F9A);
   
   // Colores complementarios
-  static const Color secondary = Color(0xFFAA96DA);
-  static const Color accent = Color(0xFFFCBAD3);
+  static const Color secondary = Color(0xFF6C7CE7);
+  static const Color accent = Color(0xFF4ECDC4);
   
   // Colores de fondo
-  static const Color background = Color(0xFFFAFAFA);
+  static const Color background = Color(0xFFF8FAFF);
   static const Color surface = Colors.white;
   
   // Colores de texto
-  static const Color textPrimary = Color(0xFF2C3E50);
-  static const Color textSecondary = Color(0xFF7F8C8D);
-  static const Color textLight = Color(0xFFBDC3C7);
+  static const Color textPrimary = Color(0xFF1A365D);
+  static const Color textSecondary = Color(0xFF4A5568);
+  static const Color textLight = Color(0xFFA0AEC0);
   
   // Colores de estado
-  static const Color success = Color(0xFF2ECC71);
-  static const Color warning = Color(0xFFF39C12);
-  static const Color error = Color(0xFFE74C3C);
-  static const Color info = Color(0xFF3498DB);
+  static const Color success = Color(0xFF38A169);
+  static const Color warning = Color(0xFFED8936);
+  static const Color error = Color(0xFFE53E3E);
+  static const Color info = Color(0xFF3182CE);
   
   // Colores de AdMob (mantener consistencia)
-  static const Color adBackground = Color(0xFFF8F9FA);
-  static const Color adBorder = Color(0xFFE9ECEF);
+  static const Color adBackground = Color(0xFFF7FAFC);
+  static const Color adBorder = Color(0xFFE2E8F0);
 }

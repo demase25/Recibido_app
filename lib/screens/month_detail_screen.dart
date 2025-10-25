@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/comprobante.dart';
 import '../services/comprobante_service.dart';
+import '../services/export_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 
 class MonthDetailScreen extends StatefulWidget {
   @override
@@ -94,6 +96,121 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
     });
   }
 
+  void _mostrarOpcionesExportacion() {
+    if (comprobantes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.noReceiptsToExport)),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(AppLocalizations.of(context)!.exportOptions),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.archive),
+                title: Text(AppLocalizations.of(context)!.exportAsZip),
+                subtitle: Text('Todos los comprobantes en un archivo ZIP'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _exportarComoZip();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.picture_as_pdf),
+                title: Text(AppLocalizations.of(context)!.exportAsPdf),
+                subtitle: Text('PDF resumen con miniaturas'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _exportarComoPdf();
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _exportarComoZip() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text(AppLocalizations.of(context)!.exporting),
+              ],
+            ),
+          );
+        },
+      );
+
+      await ExportService.exportarMesComoZip(comprobantes, mes, anio);
+      
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportSuccess)),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportError(e.toString()))),
+      );
+    }
+  }
+
+  Future<void> _exportarComoPdf() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Row(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(width: 20),
+                Text(AppLocalizations.of(context)!.exporting),
+              ],
+            ),
+          );
+        },
+      );
+
+      await ExportService.exportarMesComoPdf(comprobantes, mes, anio);
+      
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportSuccess)),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Cerrar diálogo de carga
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.exportError(e.toString()))),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -108,6 +225,13 @@ class _MonthDetailScreenState extends State<MonthDetailScreen> {
             icon: Icon(Icons.arrow_back),
             onPressed: _mostrarIntersticialYVolver,
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.file_download),
+              onPressed: _mostrarOpcionesExportacion,
+              tooltip: AppLocalizations.of(context)!.exportMonth,
+            ),
+          ],
         ),
       body: Column(
         children: [
