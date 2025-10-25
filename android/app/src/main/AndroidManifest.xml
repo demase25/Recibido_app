@@ -10,15 +10,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1255034608846557~3991811702"/>
         
-        <!-- Declaración de uso del ID de publicidad para Android 13+ -->
-        <meta-data
-            android:name="com.google.android.gms.ads.AD_ID_USAGE"
-            android:value="true" />
-        
         <!-- Configuración para soporte de 16 KB de memoria -->
-        <meta-data
-            android:name="android.app.lib_name"
-            android:value="flutter" />
         <meta-data
             android:name="android.app.lib_name"
             android:value="flutter" />
